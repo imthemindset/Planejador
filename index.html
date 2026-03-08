@@ -11,24 +11,24 @@
     <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-    /* Additional custom styles */
-    .hidden { display: none; }
-    .chart-container {
-        width: 100%;
-        max-width: 600px; /* Limita a largura máxima para evitar gráficos muito largos */
-        height: 350px; /* Altura fixa para consistência */
-        max-height: 400px; /* Altura máxima para telas grandes */
-        position: relative; /* Garante que o canvas respeite o contêiner */
-        margin: 0 auto; /* Centraliza o gráfico horizontalmente */
-        overflow: hidden; /* Evita que o conteúdo do gráfico ultrapasse o contêiner */
-    }
-    .chart-container canvas {
-        width: 100% !important; /* Força o canvas a ocupar toda a largura do contêiner */
-        height: 100% !important; /* Força o canvas a ocupar toda a altura do contêiner */
-    }
-</style>
+        .hidden { display: none; }
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            max-height: 400px;
+            position: relative;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+
     <!-- Login Screen -->
     <div id="login-screen" class="min-h-screen bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 flex items-center justify-center p-4">
         <div class="w-full max-w-md">
@@ -79,7 +79,7 @@
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow">
                     <i class="fas fa-user text-xl text-indigo-600"></i>
-                    <span class="font-semibold text-gray-700">Netozael</span>
+                    <span id="user-name" class="font-semibold text-gray-700">Usuário</span>
                 </div>
                 <select id="year-select" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white shadow">
                     <option value="2025">2025</option>
@@ -102,6 +102,10 @@
 
         <!-- Overview Tab -->
         <div id="overview" class="tab-content space-y-6">
+            <!-- ALTERAÇÃO: Mostrar mês vigente no cabeçalho da visão geral -->
+            <div class="flex items-center gap-3 mb-2">
+                <h2 class="text-lg font-semibold text-gray-600">Resumo de <span id="overview-month-label" class="text-indigo-600 font-bold"></span></h2>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
                     <div class="flex items-center justify-between">
@@ -142,7 +146,7 @@
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Fluxo de Caixa 2025</h3>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Fluxo de Caixa</h3>
                     <canvas id="cashflow-chart" class="chart-container"></canvas>
                 </div>
                 <div class="bg-white rounded-lg shadow-md p-6">
@@ -173,7 +177,6 @@
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Categoria</label>
                         <select id="new-transaction-category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            <!-- Populated by JavaScript -->
                         </select>
                     </div>
                     <div>
@@ -260,14 +263,48 @@
         </div>
 
         <!-- Categories Tab -->
-        <div id="categories" class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- ALTERAÇÃO: Adicionados filtros de ano e mês na aba Categorias -->
+        <div id="categories" class="tab-content hidden space-y-6">
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Distribuição de Despesas</h3>
-                <canvas id="category-chart" class="chart-container"></canvas>
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-filter text-2xl"></i> Filtros de Categorias
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Ano</label>
+                        <select id="category-filter-year" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Mês</label>
+                        <select id="category-filter-month" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Todos</option>
+                            <option value="0">Jan</option>
+                            <option value="1">Fev</option>
+                            <option value="2">Mar</option>
+                            <option value="3">Abr</option>
+                            <option value="4">Mai</option>
+                            <option value="5">Jun</option>
+                            <option value="6">Jul</option>
+                            <option value="7">Ago</option>
+                            <option value="8">Set</option>
+                            <option value="9">Out</option>
+                            <option value="10">Nov</option>
+                            <option value="11">Dez</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Detalhamento</h3>
-                <div id="category-details" class="space-y-3"></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Distribuição de Despesas</h3>
+                    <canvas id="category-chart" class="chart-container"></canvas>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Detalhamento</h3>
+                    <div id="category-details" class="space-y-3"></div>
+                </div>
             </div>
         </div>
 
@@ -334,83 +371,123 @@
         </div>
     </div>
 
-    <script>
-        // Data Management
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCdLPPg0DNm99j5sL02QGONqa_LQZ4Ns7M",
+            authDomain: "financial-planner-e90e2.firebaseapp.com",
+            projectId: "financial-planner-e90e2",
+            storageBucket: "financial-planner-e90e2.firebasestorage.app",
+            messagingSenderId: "313457678965",
+            appId: "1:313457678965:web:3d2059b93cc7cabf59f63c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Global Variables
+        // ALTERAÇÃO: Adicionado 'Cartão de Crédito' nas categorias de despesa
         const categories = {
-            expense: ['Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Lazer', 'Educação', 'Outros'],
+            expense: ['Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Lazer', 'Educação', 'Cartão de Crédito', 'Outros'],
             income: ['Salário', 'Freelance', 'Investimentos', 'Outros']
         };
 
-        function loadSavedData(key, defaultValue) {
-            try {
-                const saved = localStorage.getItem(key);
-                return saved ? JSON.parse(saved) : defaultValue;
-            } catch {
-                return defaultValue;
-            }
-        }
-
-        let transactions = loadSavedData('transactions', [
-            { id: 1, date: '2025-01-05', type: 'expense', category: 'Moradia', amount: 1200, description: 'Aluguel Janeiro' },
-            { id: 2, date: '2025-01-10', type: 'income', category: 'Salário', amount: 5000, description: 'Salário mensal' },
-            { id: 3, date: '2025-01-15', type: 'expense', category: 'Alimentação', amount: 350, description: 'Supermercado' },
-            { id: 4, date: '2025-02-05', type: 'expense', category: 'Moradia', amount: 1200, description: 'Aluguel Fevereiro' },
-            { id: 5, date: '2025-02-10', type: 'income', category: 'Salário', amount: 5000, description: 'Salário mensal' }
-        ]);
-
-        let goals = loadSavedData('goals', [
-            { id: 1, name: 'Fundo de Emergência', target: 20000, current: 8500, deadline: '2025-12-31' },
-            { id: 2, name: 'Viagem', target: 5000, current: 2300, deadline: '2025-07-31' }
-        ]);
-
-        let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        let transactions = [];
+        let goals = [];
+        let currentUser = null;
         let selectedYear = 2025;
         let filters = { year: '', month: '', category: '', type: '', search: '' };
+        // ALTERAÇÃO: Filtros para a aba Categorias
+        let categoryFilters = { year: '', month: '' };
+        let cashflowChart, monthlyChart, categoryChart;
 
-        // Login Handling
-document.getElementById('login-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value.trim().toLowerCase();
-    const password = document.getElementById('login-password').value.trim();
-    const errorDiv = document.getElementById('login-error');
-    const errorSpan = errorDiv.querySelector('span');
-
-    if (!email || !password) {
-        errorDiv.classList.remove('hidden');
-        errorSpan.textContent = 'Por favor, preencha todos os campos';
-        return;
-    }
-
-    // Credenciais codificadas em Base64 (NÃO SEGURAS, apenas para ofuscação)
-    const validEmail = atob('bmV0b3phZWxAZ21haWwuY29t'); // 'netozael@gmail.com' em Base64
-    const validPassword = atob('bmV0bzEyMzc0'); // 'neto12374' em Base64
-
-    if (email === validEmail && password === validPassword) {
-        isLoggedIn = true;
-        localStorage.setItem('isLoggedIn', 'true');
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        updateUI();
-    } else {
-        errorDiv.classList.remove('hidden');
-        errorSpan.textContent = 'Email ou senha incorretos. Acesso negado.';
-    }
-});
-
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            isLoggedIn = false;
-            localStorage.setItem('isLoggedIn', 'false');
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('login-form').reset();
-            document.getElementById('login-error').classList.add('hidden');
+        // Authentication Listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('user-name').textContent = user.email.split('@')[0];
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                await loadUserData();
+                updateUI();
+            } else {
+                currentUser = null;
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('dashboard').classList.add('hidden');
+            }
         });
+
+        // Login Handler
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const errorDiv = document.getElementById('login-error');
+            const errorSpan = errorDiv.querySelector('span');
+
+            // Mostra que está processando
+            errorDiv.classList.remove('hidden');
+            errorDiv.className = 'mb-4 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-lg text-blue-700 text-sm flex items-center gap-2';
+            errorSpan.textContent = 'Conectando...';
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                document.getElementById('login-form').reset();
+                errorDiv.classList.add('hidden');
+            } catch (error) {
+                console.error('Erro completo de login:', error);
+                errorDiv.className = 'mb-4 p-3 bg-red-50 border-l-4 border-red-500 rounded-lg text-red-700 text-sm flex items-center gap-2';
+                errorDiv.classList.remove('hidden');
+                
+                if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                    errorSpan.textContent = 'Email ou senha incorretos. Acesso negado.';
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorSpan.textContent = 'Sem conexão com internet. Verifique sua rede.';
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorSpan.textContent = 'Muitas tentativas. Aguarde alguns minutos.';
+                } else {
+                    errorSpan.textContent = 'Erro ao fazer login. Tente novamente.';
+                }
+            }
+        });
+
+        // Logout Handler
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await signOut(auth);
+            transactions = [];
+            goals = [];
+        });
+
+        // Load User Data from Firestore
+        async function loadUserData() {
+            if (!currentUser) return;
+
+            // Load Transactions
+            const transactionsQuery = query(collection(db, 'transactions'), where('userId', '==', currentUser.uid));
+            const transactionsSnapshot = await getDocs(transactionsQuery);
+            transactions = transactionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            // Load Goals
+            const goalsQuery = query(collection(db, 'goals'), where('userId', '==', currentUser.uid));
+            const goalsSnapshot = await getDocs(goalsQuery);
+            goals = goalsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            updateYears();
+        }
 
         // Tab Navigation
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg'));
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.add('bg-white', 'text-gray-700', 'hover:bg-gray-50'));
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg');
+                    b.classList.add('bg-white', 'text-gray-700', 'hover:bg-gray-50');
+                });
                 btn.classList.remove('bg-white', 'text-gray-700', 'hover:bg-gray-50');
                 btn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
@@ -419,7 +496,7 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
             });
         });
 
-        // Populate Categories and Years
+        // Update Categories
         function updateCategories() {
             const typeSelect = document.getElementById('new-transaction-type');
             const categorySelect = document.getElementById('new-transaction-category');
@@ -431,66 +508,162 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
         document.getElementById('new-transaction-type').addEventListener('change', updateCategories);
         updateCategories();
 
-        const yearSelect = document.getElementById('year-select');
-        const filterYearSelect = document.getElementById('filter-year');
+        // Update Years
         function updateYears() {
             const years = [...new Set(transactions.map(t => new Date(t.date).getFullYear()))];
             const allYears = [2025, 2026, 2027, 2028, 2029, 2030];
             years.forEach(year => { if (!allYears.includes(year)) allYears.push(year); });
             allYears.sort();
+            
+            const yearSelect = document.getElementById('year-select');
+            const filterYearSelect = document.getElementById('filter-year');
+            // ALTERAÇÃO: Preencher o select de ano dos filtros de categoria
+            const categoryFilterYearSelect = document.getElementById('category-filter-year');
             yearSelect.innerHTML = allYears.map(year => `<option value="${year}">${year}</option>`).join('');
             filterYearSelect.innerHTML = '<option value="">Todos</option>' + allYears.map(year => `<option value="${year}">${year}</option>`).join('');
+            categoryFilterYearSelect.innerHTML = '<option value="">Todos</option>' + allYears.map(year => `<option value="${year}">${year}</option>`).join('');
             yearSelect.value = selectedYear;
         }
-        yearSelect.addEventListener('change', () => {
-            selectedYear = parseInt(yearSelect.value);
+
+        document.getElementById('year-select').addEventListener('change', () => {
+            selectedYear = parseInt(document.getElementById('year-select').value);
             updateUI();
         });
-        updateYears();
+
+        // ALTERAÇÃO: Listeners para os filtros de categoria
+        document.getElementById('category-filter-year').addEventListener('change', (e) => {
+            categoryFilters.year = e.target.value;
+            updateCharts();
+        });
+        document.getElementById('category-filter-month').addEventListener('change', (e) => {
+            categoryFilters.month = e.target.value;
+            updateCharts();
+        });
 
         // Add Transaction
-        document.getElementById('add-transaction-btn').addEventListener('click', () => {
+        document.getElementById('add-transaction-btn').addEventListener('click', async () => {
+            if (!currentUser) {
+                alert('Você precisa estar logado para adicionar transações.');
+                return;
+            }
+            
+            const date = document.getElementById('new-transaction-date').value;
+            const type = document.getElementById('new-transaction-type').value;
+            const category = document.getElementById('new-transaction-category').value;
+            const amount = parseFloat(document.getElementById('new-transaction-amount').value);
+            const description = document.getElementById('new-transaction-description').value;
+
+            if (!date || !amount || !description) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
             const transaction = {
-                id: Date.now(),
-                date: document.getElementById('new-transaction-date').value,
-                type: document.getElementById('new-transaction-type').value,
-                category: document.getElementById('new-transaction-category').value,
-                amount: parseFloat(document.getElementById('new-transaction-amount').value),
-                description: document.getElementById('new-transaction-description').value
+                userId: currentUser.uid,
+                date: date,
+                type: type,
+                category: category,
+                amount: amount,
+                description: description,
+                createdAt: new Date().toISOString()
             };
-            if (transaction.date && transaction.amount && transaction.description) {
-                transactions.push(transaction);
-                localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            console.log('Tentando adicionar transação:', transaction);
+
+            try {
+                const docRef = await addDoc(collection(db, 'transactions'), transaction);
+                console.log('Transação adicionada com ID:', docRef.id);
+                transactions.push({ id: docRef.id, ...transaction });
+                
                 document.getElementById('new-transaction-date').value = '';
                 document.getElementById('new-transaction-type').value = 'expense';
-                document.getElementById('new-transaction-category').value = 'Moradia';
                 document.getElementById('new-transaction-amount').value = '';
                 document.getElementById('new-transaction-description').value = '';
                 updateCategories();
                 updateYears();
                 updateUI();
+                
+                alert('Lançamento adicionado com sucesso!');
+            } catch (error) {
+                console.error('Erro detalhado ao adicionar transação:', error);
+                console.error('Código do erro:', error.code);
+                console.error('Mensagem:', error.message);
+                alert(`Erro ao adicionar lançamento: ${error.message}\n\nVerifique as regras do Firestore no console do Firebase.`);
             }
         });
 
         // Add Goal
-        document.getElementById('add-goal-btn').addEventListener('click', () => {
+        document.getElementById('add-goal-btn').addEventListener('click', async () => {
+            if (!currentUser) return;
+            
             const goal = {
-                id: Date.now(),
+                userId: currentUser.uid,
                 name: document.getElementById('new-goal-name').value,
                 target: parseFloat(document.getElementById('new-goal-target').value),
                 current: parseFloat(document.getElementById('new-goal-current').value),
                 deadline: document.getElementById('new-goal-deadline').value
             };
+
             if (goal.name && goal.target && goal.current !== '' && goal.deadline) {
-                goals.push(goal);
-                localStorage.setItem('goals', JSON.stringify(goals));
-                document.getElementById('new-goal-name').value = '';
-                document.getElementById('new-goal-target').value = '';
-                document.getElementById('new-goal-current').value = '';
-                document.getElementById('new-goal-deadline').value = '';
-                updateUI();
+                try {
+                    const docRef = await addDoc(collection(db, 'goals'), goal);
+                    goals.push({ id: docRef.id, ...goal });
+                    
+                    document.getElementById('new-goal-name').value = '';
+                    document.getElementById('new-goal-target').value = '';
+                    document.getElementById('new-goal-current').value = '';
+                    document.getElementById('new-goal-deadline').value = '';
+                    updateUI();
+                } catch (error) {
+                    console.error('Erro ao adicionar objetivo:', error);
+                    alert('Erro ao adicionar objetivo. Tente novamente.');
+                }
             }
         });
+
+        // Delete Transaction
+        window.deleteTransaction = async (id) => {
+            if (!currentUser) return;
+            
+            try {
+                await deleteDoc(doc(db, 'transactions', id));
+                transactions = transactions.filter(t => t.id !== id);
+                updateYears();
+                updateUI();
+            } catch (error) {
+                console.error('Erro ao deletar transação:', error);
+                alert('Erro ao deletar lançamento. Tente novamente.');
+            }
+        };
+
+        // Delete Goal
+        window.deleteGoal = async (id) => {
+            if (!currentUser) return;
+            
+            try {
+                await deleteDoc(doc(db, 'goals', id));
+                goals = goals.filter(g => g.id !== id);
+                updateUI();
+            } catch (error) {
+                console.error('Erro ao deletar objetivo:', error);
+                alert('Erro ao deletar objetivo. Tente novamente.');
+            }
+        };
+
+        // Update Goal Progress
+        window.updateGoalProgress = async (id, value) => {
+            if (!currentUser) return;
+            
+            const newValue = parseFloat(value) || 0;
+            try {
+                await updateDoc(doc(db, 'goals', id), { current: newValue });
+                goals = goals.map(g => g.id === id ? { ...g, current: newValue } : g);
+                updateUI();
+            } catch (error) {
+                console.error('Erro ao atualizar objetivo:', error);
+                alert('Erro ao atualizar objetivo. Tente novamente.');
+            }
+        };
 
         // Filter Transactions
         function getFilteredTransactions() {
@@ -513,8 +686,7 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
         document.getElementById('filter-category').addEventListener('change', (e) => { filters.category = e.target.value; updateUI(); });
         document.getElementById('filter-search').addEventListener('input', (e) => { filters.search = e.target.value; updateUI(); });
 
-        // Charts
-        let cashflowChart, monthlyChart, categoryChart;
+        // Update Charts
         function updateCharts() {
             const monthlyData = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'].map((month, index) => {
                 const monthTransactions = transactions.filter(t => {
@@ -526,13 +698,22 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
                 return { month, income, expenses, savings: income - expenses };
             });
 
+            // ALTERAÇÃO: Aplicar filtros de ano e mês na aba de categorias
             const categoryData = (() => {
-                const yearTransactions = transactions.filter(t => new Date(t.date).getFullYear() === selectedYear && t.type === 'expense');
+                let categoryTransactions = transactions.filter(t => t.type === 'expense');
+                if (categoryFilters.year) {
+                    categoryTransactions = categoryTransactions.filter(t => new Date(t.date).getFullYear() === parseInt(categoryFilters.year));
+                } else {
+                    categoryTransactions = categoryTransactions.filter(t => new Date(t.date).getFullYear() === selectedYear);
+                }
+                if (categoryFilters.month !== '') {
+                    categoryTransactions = categoryTransactions.filter(t => new Date(t.date).getMonth() === parseInt(categoryFilters.month));
+                }
                 const categoryTotals = {};
-                yearTransactions.forEach(t => {
+                categoryTransactions.forEach(t => {
                     categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
                 });
-                const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6b7280'];
+                const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6b7280', '#f97316'];
                 return Object.entries(categoryTotals).map(([name, value], index) => ({
                     name, value, color: colors[index % colors.length]
                 }));
@@ -579,7 +760,8 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
             });
 
             const categoryDetails = document.getElementById('category-details');
-            categoryDetails.innerHTML = categoryData.map(cat => `
+            const totalCategoryValue = categoryData.reduce((sum, c) => sum + c.value, 0);
+            categoryDetails.innerHTML = categoryData.length > 0 ? categoryData.map(cat => `
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div class="flex items-center gap-3">
                         <div class="w-4 h-4 rounded-full" style="background-color: ${cat.color}"></div>
@@ -587,23 +769,29 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
                     </div>
                     <div class="text-right">
                         <p class="font-bold text-gray-800">R$ ${cat.value.toLocaleString('pt-BR')}</p>
-                        <p class="text-sm text-gray-500">${((cat.value / categoryData.reduce((sum, c) => sum + c.value, 0)) * 100).toFixed(1)}%</p>
+                        <p class="text-sm text-gray-500">${((cat.value / totalCategoryValue) * 100).toFixed(1)}%</p>
                     </div>
                 </div>
-            `).join('');
+            `).join('') : '<p class="text-center text-gray-500 py-4">Nenhuma despesa no período selecionado</p>';
         }
 
         // Update UI
         function updateUI() {
-            if (!isLoggedIn) {
-                document.getElementById('login-screen').classList.remove('hidden');
-                document.getElementById('dashboard').classList.add('hidden');
-                return;
-            }
+            if (!currentUser) return;
 
-            const yearTransactions = transactions.filter(t => new Date(t.date).getFullYear() === selectedYear);
-            const totalIncome = yearTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-            const totalExpenses = yearTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            // ALTERAÇÃO: Visão Geral mostra apenas o mês vigente
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            document.getElementById('overview-month-label').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            const currentMonthTransactions = transactions.filter(t => {
+                const d = new Date(t.date);
+                return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+            });
+            const totalIncome = currentMonthTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const totalExpenses = currentMonthTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
             const totalSavings = totalIncome - totalExpenses;
             const savingsRate = totalIncome > 0 ? (totalSavings / totalIncome) * 100 : 0;
 
@@ -631,7 +819,7 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
                         ${t.type === 'income' ? '+' : '-'} R$ ${t.amount.toLocaleString('pt-BR')}
                     </td>
                     <td class="px-4 py-3 text-center">
-                        <button onclick="deleteTransaction(${t.id})" class="text-red-600 hover:text-red-800"><i class="fas fa-trash-alt"></i></button>
+                        <button onclick="deleteTransaction('${t.id}')" class="text-red-600 hover:text-red-800"><i class="fas fa-trash-alt"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -648,7 +836,7 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="px-3 py-1 bg-indigo-600 text-white rounded-full text-sm font-semibold">${Math.round(progress)}%</span>
-                                <button onclick="deleteGoal(${goal.id})" class="text-red-600 hover:text-red-800"><i class="fas fa-trash-alt"></i></button>
+                                <button onclick="deleteGoal('${goal.id}')" class="text-red-600 hover:text-red-800"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -662,7 +850,7 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
                         </div>
                         <div class="flex gap-2">
                             <input type="number" step="0.01" value="${goal.current}" class="goal-progress flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Atualizar progresso">
-                            <button onclick="updateGoalProgress(${goal.id}, this.previousElementSibling.value)" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-semibold">Atualizar</button>
+                            <button onclick="updateGoalProgress('${goal.id}', this.previousElementSibling.value)" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-semibold">Atualizar</button>
                         </div>
                     </div>
                 `;
@@ -672,31 +860,9 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
             updateCharts();
         }
 
-        function deleteTransaction(id) {
-            transactions = transactions.filter(t => t.id !== id);
-            localStorage.setItem('transactions', JSON.stringify(transactions));
-            updateYears();
-            updateUI();
-        }
-
-        function deleteGoal(id) {
-            goals = goals.filter(g => g.id !== id);
-            localStorage.setItem('goals', JSON.stringify(goals));
-            updateUI();
-        }
-
-        function updateGoalProgress(id, value) {
-            goals = goals.map(g => g.id === id ? { ...g, current: parseFloat(value) || 0 } : g);
-            localStorage.setItem('goals', JSON.stringify(goals));
-            updateUI();
-        }
-
-        // Initial Render
-        if (isLoggedIn) {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
-            updateUI();
-        }
+        // Initialize
+        updateYears();
     </script>
+
 </body>
 </html>
