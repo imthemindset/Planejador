@@ -80,6 +80,11 @@
                 <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow">
                     <i class="fas fa-user text-xl text-indigo-600"></i>
                     <span id="user-name" class="font-semibold text-gray-700">Usuário</span>
+                    <span class="text-gray-300 mx-1">|</span>
+                    <span id="year-balance-value" class="font-bold text-green-600 text-sm"></span>
+                    <button id="toggle-balance-btn" class="text-gray-400 hover:text-indigo-600 transition-colors ml-1" title="Mostrar/ocultar saldo">
+                        <i id="toggle-balance-icon" class="fas fa-eye text-sm"></i>
+                    </button>
                 </div>
                 <select id="year-select" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white shadow">
                     <option value="2025">2025</option>
@@ -775,9 +780,41 @@
             `).join('') : '<p class="text-center text-gray-500 py-4">Nenhuma despesa no período selecionado</p>';
         }
 
+        // Toggle balance visibility
+        let balanceVisible = true;
+        document.getElementById('toggle-balance-btn').addEventListener('click', () => {
+            balanceVisible = !balanceVisible;
+            const icon = document.getElementById('toggle-balance-icon');
+            const valueEl = document.getElementById('year-balance-value');
+            if (balanceVisible) {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                valueEl.dataset.hidden = 'false';
+                updateYearBalance();
+            } else {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                valueEl.textContent = '••••••';
+                valueEl.className = 'font-bold text-gray-400 text-sm';
+            }
+        });
+
+        function updateYearBalance() {
+            if (!balanceVisible) return;
+            const yearTransactions = transactions.filter(t => new Date(t.date).getFullYear() === selectedYear);
+            const yearIncome = yearTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const yearExpenses = yearTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const yearBalance = yearIncome - yearExpenses;
+            const valueEl = document.getElementById('year-balance-value');
+            valueEl.textContent = `R$ ${yearBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            valueEl.className = `font-bold text-sm ${yearBalance >= 0 ? 'text-green-600' : 'text-red-500'}`;
+        }
+
         // Update UI
         function updateUI() {
             if (!currentUser) return;
+
+            updateYearBalance();
 
             // ALTERAÇÃO: Visão Geral mostra apenas o mês vigente
             const now = new Date();
